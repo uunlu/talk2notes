@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/your_database_name
+    username: postgres
+    password: your_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+
+# Logging configuration
+logging:
+  level:
+    org:
+      springframework: INFO
+      hibernate: INFO
+      postgresql: DEBUG
+      flywaydb: DEBUG
