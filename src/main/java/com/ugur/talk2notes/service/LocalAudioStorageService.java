@@ -35,17 +35,35 @@ public class LocalAudioStorageService {
       }
 
       final String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
-      final String extension = FilenameUtils.getExtension(originalFilename);
-      final String filename = String.format("%d/%d.%s", userId, audioId, extension);
 
-      final Path targetLocation = this.rootLocation.resolve(filename);
+      // Handle null or empty original filename
+      if (originalFilename == null || originalFilename.trim().isEmpty()) {
+        throw new StorageException("Original filename cannot be null or empty");
+      }
+
+      final String extension = FilenameUtils.getExtension(originalFilename);
+      final String baseFilename = FilenameUtils.getBaseName(originalFilename);
+
+      // Construct the filename
+      final String filename =
+          (extension == null || extension.isEmpty())
+              ? baseFilename
+              : String.format("%s.%s", baseFilename, extension);
+
+      // Construct the full path with directories for userId and audioId
+      final Path targetLocation =
+          this.rootLocation.resolve(String.format("%d/%d", userId, audioId)).resolve(filename);
+
+      // Ensure the parent directories exist
       Files.createDirectories(targetLocation.getParent());
 
+      // Copy the file to the target location
       try (InputStream inputStream = file.getInputStream()) {
         Files.copy(inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING);
       }
 
-      return filename;
+      // Return the relative path of the stored file
+      return String.format("%d/%d/%s", userId, audioId, filename);
     } catch (IOException e) {
       throw new StorageException("Failed to store file", e);
     }

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -59,9 +60,9 @@ public class AudioController {
     response.setId(audioFile.getId());
     response.setTitle(audioFile.getTitle());
     response.setStatus(audioFile.getStatus().name());
-    response.setMessage("Audio file uploaded successfully");
+    response.setMessage("Audio uploaded successfully");
 
-    return ResponseEntity.ok(response);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @GetMapping("/{audioId}")
@@ -96,6 +97,10 @@ public class AudioController {
 
   @DeleteMapping("/{audioId}")
   public ResponseEntity<Void> deleteAudioFile(@PathVariable final Long audioId) {
+    // First check if the file exists (this will throw ResourceNotFoundException if not found)
+    this.audioFileService.getAudioFileById(audioId, "default");
+    
+    // Then delete it
     this.audioFileService.deleteAudioFile(audioId, "default"); // TODO: Replace with actual user ID
     return ResponseEntity.noContent().build();
   }
