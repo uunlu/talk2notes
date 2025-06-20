@@ -17,7 +17,7 @@ import com.ugur.talk2notes.model.AudioFile;
 import com.ugur.talk2notes.model.AudioStatus;
 import com.ugur.talk2notes.model.User;
 import com.ugur.talk2notes.service.AudioFileService;
-import com.ugur.talk2notes.service.AudioValidator;
+import com.ugur.talk2notes.validation.AudioValidator;
 import com.ugur.talk2notes.service.LocalAudioStorageService;
 import java.time.LocalDateTime;
 import java.util.Arrays;

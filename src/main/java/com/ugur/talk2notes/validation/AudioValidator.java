@@ -1,4 +1,4 @@
-package com.ugur.talk2notes.service;
+package com.ugur.talk2notes.validation;
 
 import com.ugur.talk2notes.exception.InvalidRequestException;
 import java.util.Arrays;

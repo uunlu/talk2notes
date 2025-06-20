@@ -5,7 +5,7 @@ import com.ugur.talk2notes.dto.AudioUploadRequest;
 import com.ugur.talk2notes.dto.AudioUploadResponse;
 import com.ugur.talk2notes.model.AudioFile;
 import com.ugur.talk2notes.service.AudioFileService;
-import com.ugur.talk2notes.service.AudioValidator;
+import com.ugur.talk2notes.validation.AudioValidator;
 import com.ugur.talk2notes.service.LocalAudioStorageService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -99,9 +99,9 @@ public class AudioController {
   public ResponseEntity<Void> deleteAudioFile(@PathVariable final Long audioId) {
     // First check if the file exists (this will throw ResourceNotFoundException if not found)
     this.audioFileService.getAudioFileById(audioId, "default");
-    
+    // TODO: Replace with actual user ID
     // Then delete it
-    this.audioFileService.deleteAudioFile(audioId, "default"); // TODO: Replace with actual user ID
+    this.audioFileService.deleteAudioFile(audioId, "default");
     return ResponseEntity.noContent().build();
   }
 }

@@ -52,7 +52,9 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private Set<AudioFile> audioFiles = new HashSet<>();
 
-  public User() {}
+  public User() {
+
+  }
 
   public User(final String username, final String email, final String password) {
     this.username = username;
