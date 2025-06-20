@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: myapp
+      POSTGRES_DB: talk2notes  # Changed from myapp to talk2notes
     ports:
       - "5432:5432"
     volumes:
@@ -42,11 +42,11 @@ services:
       context: .
       dockerfile: Dockerfile
     # For production, you can use the Docker Hub image instead:
-    # image: ugurunlu/f1-app-v1:stable
+    # image: ugurunlu/talk2notes:latest  # Changed repository name
     container_name: talk2notes-app
     environment:
       # Database configuration
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/myapp
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/talk2notes  # Changed from myapp to talk2notes
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
 
@@ -79,6 +79,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+    # Add restart policy for resilience
+    restart: unless-stopped
 
 networks:
   app-network:
