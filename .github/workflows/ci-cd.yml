@@ -31,9 +31,12 @@ jobs:
         run: mvn -B -ntp spotless:check
 
       - name: Build and Test with Maven
-        run: mvn -B -ntp clean verify -Dspring.profiles.active=test "-Dtest=!**/*IntegrationTest.java"
+        run: |
+          mvn -B -ntp clean verify \
+          -Dspring.profiles.active=test \
+          -DexcludedGroups="integration"
 
-      # Only run Docker build and push steps for main branch
+    # Only run Docker build and push steps for main branch
       - name: Set up Docker Buildx
         if: github.ref == 'refs/heads/main'
         uses: docker/setup-buildx-action@v3
