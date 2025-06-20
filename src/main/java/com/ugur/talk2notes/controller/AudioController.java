@@ -9,6 +9,7 @@ import com.ugur.talk2notes.service.LocalAudioStorageService;
 import com.ugur.talk2notes.validation.AudioValidator;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,19 +27,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/audio")
+@RequiredArgsConstructor
 public class AudioController {
   private final AudioFileService audioFileService;
   private final AudioValidator audioValidator;
   private final LocalAudioStorageService storageService;
-
-  public AudioController(
-      final AudioFileService audioFileService,
-      final AudioValidator audioValidator,
-      final LocalAudioStorageService storageService) {
-    this.audioFileService = audioFileService;
-    this.audioValidator = audioValidator;
-    this.storageService = storageService;
-  }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<AudioUploadResponse> uploadAudio(
