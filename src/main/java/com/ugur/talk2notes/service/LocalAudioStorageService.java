@@ -55,7 +55,7 @@ public class LocalAudioStorageService {
 
       // Rest of your method remains the same...
       final Path targetLocation =
-              this.rootLocation.resolve(String.format("%d/%d", userId, audioId)).resolve(filename);
+          this.rootLocation.resolve(String.format("%d/%d", userId, audioId)).resolve(filename);
 
       Files.createDirectories(targetLocation.getParent());
 

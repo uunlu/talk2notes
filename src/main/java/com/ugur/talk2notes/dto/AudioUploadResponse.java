@@ -12,9 +12,7 @@ public class AudioUploadResponse {
   private String message;
   private LocalDateTime uploadedAt;
 
-  public AudioUploadResponse() {
-
-  }
+  public AudioUploadResponse() {}
 
   public AudioUploadResponse(
       final Long id, final String title, final String status, final String message) {
