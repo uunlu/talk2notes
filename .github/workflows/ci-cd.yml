@@ -19,6 +19,31 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'maven' # Add debugging steps
+      - name: Debug environment
+        run: |
+          echo "Java version:"
+          java -version
+          echo "Maven version:"
+          mvn --version
+          echo "Project structure:"
+          find src -type f -name "*.java" | sort
+
+      - name: Verify dependencies and Lombok annotation processing
+        run: |
+          echo "Checking for Lombok in pom.xml:"
+          grep -A 5 lombok pom.xml || echo "Lombok not found in pom.xml"
+
+          echo "Checking AudioFile class for annotations:"
+          cat src/main/java/com/ugur/talk2notes/model/AudioFile.java | grep -E '@(Data|Getter|Setter|Entity)' || echo "No annotations found"
+
+          echo "Checking application main class:"
+          find src -name "Talk*.java" -type f
+
+      # Install dependencies explicitly before compilation
+      - name: Install dependencies
+        run: mvn -B dependency:resolve dependency:resolve-plugins
+
 
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -54,7 +79,7 @@ jobs:
         run: |
           # Get commit SHA for tagging
           SHORT_SHA=${GITHUB_SHA::7}
-          
+
           # Create tags: latest and versioned with SHA
           echo "DOCKER_TAGS=ugurunlu/talk2notes:latest,ugurunlu/talk2notes:${SHORT_SHA}" >> $GITHUB_ENV
 
