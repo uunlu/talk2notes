@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class Talk2NotesApplication {
-    public static void main(final String[] args) {
-        SpringApplication.run(Talk2NotesApplication.class, args);
-    }
+  public static void main(final String[] args) {
+    SpringApplication.run(Talk2NotesApplication.class, args);
+  }
 }

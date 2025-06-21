@@ -8,15 +8,20 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# Install Lombok explicitly (optional but recommended for CI/CD)
+RUN ./mvnw dependency:go-offline
+RUN ./mvnw dependency:tree | grep lombok
+
 # Download dependencies (this layer will be cached if pom.xml doesn't change)
 RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 
-# Copy source code
+# Copy source code and config files
 COPY src ./src
+COPY config ./config
 
 # Build the application
-# RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre

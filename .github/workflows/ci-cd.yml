@@ -1,0 +1,106 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven' # Add debugging steps
+      - name: Debug environment
+        run: |
+          echo "Java version:"
+          java -version
+          echo "Maven version:"
+          mvn --version
+          echo "Project structure:"
+          find src -type f -name "*.java" | sort
+
+      - name: Verify dependencies and Lombok annotation processing
+        run: |
+          echo "Checking for Lombok in pom.xml:"
+          grep -A 5 lombok pom.xml || echo "Lombok not found in pom.xml"
+
+          echo "Checking AudioFile class for annotations:"
+          cat src/main/java/com/ugur/talk2notes/model/AudioFile.java | grep -E '@(Data|Getter|Setter|Entity)' || echo "No annotations found"
+
+          echo "Checking application main class:"
+          find src -name "Talk*.java" -type f
+
+      # Install dependencies explicitly before compilation
+      - name: Install dependencies
+        run: mvn -B dependency:resolve dependency:resolve-plugins
+
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Check code format with Spotless
+        run: mvn -B -ntp spotless:check
+
+      - name: Build and Test with Maven
+        run: |
+          mvn -B -ntp clean verify \
+          -Dspring.profiles.active=test \
+          -DexcludedGroups="integration"
+
+    # Only run Docker build and push steps for main branch
+      - name: Set up Docker Buildx
+        if: github.ref == 'refs/heads/main'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set Docker Tags
+        if: github.ref == 'refs/heads/main'
+        id: docker-tags
+        run: |
+          # Get commit SHA for tagging
+          SHORT_SHA=${GITHUB_SHA::7}
+
+          # Create tags: latest and versioned with SHA
+          echo "DOCKER_TAGS=ugurunlu/talk2notes:latest,ugurunlu/talk2notes:${SHORT_SHA}" >> $GITHUB_ENV
+
+      - name: Build and push Docker Image
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ env.DOCKER_TAGS }}
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Container Security Scan with Trivy
+        if: github.ref == 'refs/heads/main'
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ugurunlu/talk2notes:latest
+          format: 'table'
+          exit-code: '1'
+          severity: 'HIGH,CRITICAL'
+
